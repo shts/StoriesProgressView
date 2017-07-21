@@ -3,8 +3,9 @@ StoriesProgressView
 
 show horizontal progress like instagram stories.
 
-<src="image/image.gif" width=300 />
+<img src="image/capture.png" width=200 />
 
+<img src="image/image.gif" width=200 /> 
 
 How to Use
 ----
