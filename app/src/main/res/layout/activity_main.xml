@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:contentDescription="@null" />
 
-    <jp.shts.android.storyprogressbar.StoriesProgressView
+    <jp.shts.android.storiesprogressview.StoriesProgressView
         android:id="@+id/stories"
         android:layout_width="match_parent"
         android:layout_height="3dp"
