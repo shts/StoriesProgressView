@@ -93,7 +93,7 @@ Add the dependency
 
 ```
 	dependencies {
-	        compile 'com.github.shts:StoriesProgressView:1.0.0'
+	        compile 'com.github.shts:StoriesProgressView:1.2.0'
 	}
 
 ```
