@@ -9,6 +9,24 @@
         android:layout_height="match_parent"
         android:contentDescription="@null" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/reverse"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <View
+            android:id="@+id/skip"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+
     <jp.shts.android.storiesprogressview.StoriesProgressView
         android:id="@+id/stories"
         android:layout_width="match_parent"

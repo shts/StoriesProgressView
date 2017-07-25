@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import jp.shts.android.storiesprogressview.StoriesProgressView;
 
@@ -25,9 +24,9 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
             R.drawable.sample6,
     };
 
-    private final long[] durations = new long[]{
-            500L, 1000L, 1500L, 4000L, 5000L, 1000,
-    };
+//    private final long[] durations = new long[]{
+//            500L, 1000L, 1500L, 4000L, 5000L, 1000,
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +49,39 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
             }
         });
         image.setImageResource(resources[counter]);
+
+        // bind reverse view
+        View reverse = findViewById(R.id.reverse);
+        reverse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                storiesProgressView.reverse();
+            }
+        });
+
+        // bind skip view
+        View skip = findViewById(R.id.skip);
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                storiesProgressView.skip();
+            }
+        });
     }
 
     @Override
     public void onNext() {
-        Toast.makeText(this, "onNext", Toast.LENGTH_SHORT).show();
         image.setImageResource(resources[++counter]);
     }
 
     @Override
+    public void onPrev() {
+        if (counter - 1 < 0) return;
+        image.setImageResource(resources[--counter]);
+    }
+
+    @Override
     public void onComplete() {
-        Toast.makeText(this, "onComplete", Toast.LENGTH_SHORT).show();
     }
 
     @Override

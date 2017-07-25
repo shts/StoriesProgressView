@@ -29,12 +29,18 @@ public class StoriesProgressView extends LinearLayout {
     private final List<ObjectAnimator> animators = new ArrayList<>();
 
     private int storiesCount = -1;
-    /** pointer of running animation */
+    /**
+     * pointer of running animation
+     */
     private int current = 0;
     private StoriesListener storiesListener;
+    boolean isReverse;
+    boolean isComplete;
 
     public interface StoriesListener {
         public void onNext();
+
+        public void onPrev();
 
         public void onComplete();
     }
@@ -117,9 +123,28 @@ public class StoriesProgressView extends LinearLayout {
      * Skip current story
      */
     public void skip() {
+        if (isComplete) return;
         ProgressBar p = progressBars.get(current);
         p.setProgress(p.getMax());
         animators.get(current).cancel();
+    }
+
+    /**
+     * Reverse current story
+     */
+    public void reverse() {
+        if (isComplete) return;
+        ProgressBar p = progressBars.get(current);
+        p.setProgress(0);
+        isReverse = true;
+        animators.get(current).cancel();
+        if (0 <= (current - 1)) {
+            p = progressBars.get(current - 1);
+            p.setProgress(0);
+            animators.get(--current).start();
+        } else {
+            animators.get(current).start();
+        }
     }
 
     /**
@@ -136,6 +161,7 @@ public class StoriesProgressView extends LinearLayout {
 
     /**
      * Set stories count and each story duration
+     *
      * @param durations milli
      */
     public void setStoriesCountWithDurations(@NonNull long[] durations) {
@@ -176,26 +202,23 @@ public class StoriesProgressView extends LinearLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                animation.removeAllListeners();
+                if (isReverse) {
+                    isReverse = false;
+                    if (storiesListener != null) storiesListener.onPrev();
+                    return;
+                }
                 int next = current + 1;
                 if (next <= (animators.size() - 1)) {
                     if (storiesListener != null) storiesListener.onNext();
                     animators.get(next).start();
                 } else {
+                    isComplete = true;
                     if (storiesListener != null) storiesListener.onComplete();
                 }
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-                animation.removeAllListeners();
-                int next = current + 1;
-                if (next <= (animators.size() - 1)) {
-                    if (storiesListener != null) storiesListener.onNext();
-                    animators.get(next).start();
-                } else {
-                    if (storiesListener != null) storiesListener.onComplete();
-                }
             }
 
             @Override
