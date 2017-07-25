@@ -3,6 +3,8 @@ StoriesProgressView
 
 show horizontal progress like instagram stories.
 
+[![](https://jitpack.io/v/shts/StoriesProgressView.svg)](https://jitpack.io/#shts/StoriesProgressView)
+
 <img src="image/capture.png" width=200 />
 
 <img src="image/image.gif" width=200 /> 
