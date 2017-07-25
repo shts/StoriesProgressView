@@ -20,6 +20,7 @@ To see how the StoriesProgressView are added to your xml layouts, check the samp
         android:layout_gravity="top"
         android:layout_marginTop="8dp" />
 ```
+Overview
 
 ```java
 public class YourActivity extends AppCompatActivity implements StoriesProgressView.StoriesListener {
@@ -42,6 +43,12 @@ public class YourActivity extends AppCompatActivity implements StoriesProgressVi
     }
 
     @Override
+    public void onPrev() {
+        // Call when finished revserse animation.
+        Toast.makeText(this, "onPrev", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onComplete() {
         Toast.makeText(this, "onComplete", Toast.LENGTH_SHORT).show();
     }
@@ -53,6 +60,16 @@ public class YourActivity extends AppCompatActivity implements StoriesProgressVi
         super.onDestroy();
     }
 }
+```
+
+Skip story
+---
+
+<img src="image/skip-reverse.gif" width=200 /> 
+
+```java
+  storiesProgressView.skip();
+  storiesProgressView.reverse();  
 ```
 
 Install
