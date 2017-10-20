@@ -2,6 +2,7 @@ package jp.shts.android.storyprogressbar;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -9,6 +10,7 @@ import jp.shts.android.storiesprogressview.StoriesProgressView;
 
 public class MainActivity extends AppCompatActivity implements StoriesProgressView.StoriesListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int PROGRESS_COUNT = 6;
 
     private StoriesProgressView storiesProgressView;
@@ -35,19 +37,13 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
 
         storiesProgressView = (StoriesProgressView) findViewById(R.id.stories);
         storiesProgressView.setStoriesCount(PROGRESS_COUNT);
-        storiesProgressView.setStoryDuration(1200L);
+        storiesProgressView.setStoryDuration(5000L);
         // or
         // storiesProgressView.setStoriesCountWithDurations(durations);
         storiesProgressView.setStoriesListener(this);
         storiesProgressView.startStories();
 
         image = (ImageView) findViewById(R.id.image);
-        image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                storiesProgressView.skip();
-            }
-        });
         image.setImageResource(resources[counter]);
 
         // bind reverse view
@@ -71,17 +67,20 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
 
     @Override
     public void onNext() {
+        Log.d(TAG, "onNext: in");
         image.setImageResource(resources[++counter]);
     }
 
     @Override
     public void onPrev() {
-        if (counter - 1 < 0) return;
+        Log.d(TAG, "onPrev: in");
+        if ((counter - 1) < 0) return;
         image.setImageResource(resources[--counter]);
     }
 
     @Override
     public void onComplete() {
+        Log.d(TAG, "onComplete: in");
     }
 
     @Override

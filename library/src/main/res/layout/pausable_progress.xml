@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <View
+        android:id="@+id/back_progress"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/progress_secondary" />
+
+    <View
+        android:id="@+id/front_progress"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/progress_primary"
+        android:visibility="invisible"
+        tools:visibility="visible"/>
+
+    <View
+        android:id="@+id/max_progress"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#fff"
+        android:visibility="gone" />
+</FrameLayout>
