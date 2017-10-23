@@ -64,15 +64,25 @@ public class YourActivity extends AppCompatActivity implements StoriesProgressVi
 }
 ```
 
-Skip story
+Skip and Reverse story
 ---
 
-<img src="image/skip-reverse.gif" width=200 /> 
+<img src="image/skip-reverse.gif" width=200 />
 
 ```java
   storiesProgressView.skip();
-  storiesProgressView.reverse();  
+  storiesProgressView.reverse();
 ```
+
+Pause and Resume story
+---
+<img src="image/pause-resume.gif" width=200 />
+
+```java
+  storiesProgressView.skip();
+  storiesProgressView.reverse();
+```
+
 
 Install
 ---
@@ -93,7 +103,7 @@ Add the dependency
 
 ```
 	dependencies {
-	        compile 'com.github.shts:StoriesProgressView:1.2.0'
+	        compile 'com.github.shts:StoriesProgressView:2.0.0'
 	}
 
 ```
@@ -102,7 +112,7 @@ License
 ---
 
 ```
-Copyright (C) 2017 Shota Saito
+Copyright (C) 2017 Shota Saito(shts)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
