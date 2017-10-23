@@ -79,8 +79,8 @@ Pause and Resume story
 <img src="image/pause-resume.gif" width=200 />
 
 ```java
-  storiesProgressView.skip();
-  storiesProgressView.reverse();
+  storiesProgressView.pause();
+  storiesProgressView.resume();
 ```
 
 
