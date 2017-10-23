@@ -13,7 +13,8 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 
-public class PausableProgressBar extends FrameLayout {
+final class PausableProgressBar extends FrameLayout {
+
     /***
      * progress満了タイマーのデフォルト時間
      */
