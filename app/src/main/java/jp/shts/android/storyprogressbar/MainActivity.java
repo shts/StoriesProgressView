@@ -2,15 +2,15 @@ package jp.shts.android.storyprogressbar;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import jp.shts.android.storiesprogressview.StoriesProgressView;
 
 public class MainActivity extends AppCompatActivity implements StoriesProgressView.StoriesListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int PROGRESS_COUNT = 6;
 
     private StoriesProgressView storiesProgressView;
@@ -26,18 +26,39 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
             R.drawable.sample6,
     };
 
-//    private final long[] durations = new long[]{
-//            500L, 1000L, 1500L, 4000L, 5000L, 1000,
-//    };
+    private final long[] durations = new long[]{
+            500L, 1000L, 1500L, 4000L, 5000L, 1000,
+    };
+
+    long pressTime = 0L;
+    long limit = 500L;
+
+    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    pressTime = System.currentTimeMillis();
+                    storiesProgressView.pause();
+                    return false;
+                case MotionEvent.ACTION_UP:
+                    long now = System.currentTimeMillis();
+                    storiesProgressView.resume();
+                    return limit < now - pressTime;
+            }
+            return false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
         storiesProgressView = (StoriesProgressView) findViewById(R.id.stories);
         storiesProgressView.setStoriesCount(PROGRESS_COUNT);
-        storiesProgressView.setStoryDuration(5000L);
+        storiesProgressView.setStoryDuration(3000L);
         // or
         // storiesProgressView.setStoriesCountWithDurations(durations);
         storiesProgressView.setStoriesListener(this);
@@ -54,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
                 storiesProgressView.reverse();
             }
         });
+        reverse.setOnTouchListener(onTouchListener);
 
         // bind skip view
         View skip = findViewById(R.id.skip);
@@ -63,24 +85,22 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
                 storiesProgressView.skip();
             }
         });
+        skip.setOnTouchListener(onTouchListener);
     }
 
     @Override
     public void onNext() {
-        Log.d(TAG, "onNext: in");
         image.setImageResource(resources[++counter]);
     }
 
     @Override
     public void onPrev() {
-        Log.d(TAG, "onPrev: in");
         if ((counter - 1) < 0) return;
         image.setImageResource(resources[--counter]);
     }
 
     @Override
     public void onComplete() {
-        Log.d(TAG, "onComplete: in");
     }
 
     @Override

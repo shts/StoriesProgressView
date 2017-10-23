@@ -7,7 +7,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -127,15 +126,7 @@ public class StoriesProgressView extends LinearLayout {
         if (isComplete) return;
         isReverse = true;
         PausableProgressBar p = progressBars.get(current);
-        p.setMin(); // 背景色の変更だけでなく 背景を INVISIBLE にしないとだめ
-
-//        if (0 <= (current - 1)) {
-//            p = progressBars.get(current - 1);
-//            p.setMin();
-//            progressBars.get(--current).startProgress();
-//        } else {
-//            progressBars.get(current).startProgress();
-//        }
+        p.setMin();
     }
 
     /**
@@ -164,23 +155,18 @@ public class StoriesProgressView extends LinearLayout {
         }
     }
 
-    private static final String TAG = StoriesProgressView.class.getSimpleName();
-
     private PausableProgressBar.Callback callback(final int index) {
         return new PausableProgressBar.Callback() {
             @Override
             public void onStartProgress() {
-                Log.d(TAG, "onStartProgress: in: current(" + current + ")");
                 current = index;
             }
 
             @Override
             public void onFinishProgress() {
-                Log.d(TAG, "onFinishProgress: in: current(" + current + ")");
                 if (isReverse) {
                     isReverse = false;
                     if (storiesListener != null) storiesListener.onPrev();
-                    // TODO: このあたりがおかしい
                     if (0 <= (current - 1)) {
                         PausableProgressBar p = progressBars.get(current - 1);
                         p.setMinWithoutCallback();
@@ -218,10 +204,16 @@ public class StoriesProgressView extends LinearLayout {
         }
     }
 
+    /**
+     * Pause story
+     */
     public void pause() {
         progressBars.get(current).pauseProgress();
     }
 
+    /**
+     * Resume story
+     */
     public void resume() {
         progressBars.get(current).resumeProgress();
     }
