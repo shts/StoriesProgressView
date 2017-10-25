@@ -9,6 +9,8 @@ show horizontal progress like instagram stories.
 
 <img src="image/image.gif" width=200 /> 
 
+^She is [Yui Kobayashi](http://www.keyakizaka46.com/s/k46o/artist/07)
+
 How to Use
 ----
 
