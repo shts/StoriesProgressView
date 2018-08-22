@@ -105,7 +105,7 @@ Add the dependency
 
 ```
 	dependencies {
-	        compile 'com.github.shts:StoriesProgressView:2.0.0'
+	        compile 'com.github.shts:StoriesProgressView:3.0.0'
 	}
 
 ```
