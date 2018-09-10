@@ -169,6 +169,7 @@ public class StoriesProgressView extends LinearLayout {
             @Override
             public void onStartProgress() {
                 current = index;
+                if (storiesListener != null) storiesListener.onNext();
             }
 
             @Override
@@ -187,7 +188,6 @@ public class StoriesProgressView extends LinearLayout {
                 }
                 int next = current + 1;
                 if (next <= (progressBars.size() - 1)) {
-                    if (storiesListener != null) storiesListener.onNext();
                     progressBars.get(next).startProgress();
                 } else {
                     isComplete = true;
