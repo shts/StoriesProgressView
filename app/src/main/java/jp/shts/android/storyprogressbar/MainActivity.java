@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
         storiesProgressView.startStories(counter);
 
         image = (ImageView) findViewById(R.id.image);
+        image.setImageResource(resources[counter]);
 
         // bind reverse view
         View reverse = findViewById(R.id.reverse);
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements StoriesProgressVi
 
     @Override
     public void onNext() {
-        image.setImageResource(resources[counter++]);
+        image.setImageResource(resources[++counter]);
     }
 
     @Override
