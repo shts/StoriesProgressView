@@ -1,7 +1,7 @@
 StoriesProgressView
 ====
 
-show horizontal progress like instagram stories.
+Library that shows a horizontal progress like Instagram stories.
 
 [![](https://jitpack.io/v/shts/StoriesProgressView.svg)](https://jitpack.io/#shts/StoriesProgressView)
 
@@ -14,7 +14,7 @@ show horizontal progress like instagram stories.
 How to Use
 ----
 
-To see how the StoriesProgressView are added to your xml layouts, check the sample project.
+To see how a StoriesProgressView can be added to your xml layouts, check the sample project.
 
 ```xml
     <jp.shts.android.storiesprogressview.StoriesProgressView
@@ -93,10 +93,10 @@ Add it in your root build.gradle at the end of repositories:
 
 ```groovy
 allprojects {
-		repositories {
-			...
-			maven { url "https://jitpack.io" }
-		}
+    repositories {
+        ...
+        maven { url "https://jitpack.io" }
+    }
 }
 
 ```
@@ -104,9 +104,9 @@ allprojects {
 Add the dependency
 
 ```
-	dependencies {
-	        compile 'com.github.shts:StoriesProgressView:3.0.0'
-	}
+dependencies {
+    implementation 'com.github.shts:StoriesProgressView:3.0.0'
+}
 
 ```
 
