@@ -47,12 +47,10 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 pressTime = System.currentTimeMillis()
-                Timber.v("MotionEvent.ACTION_DOWN")
                 storiesProgressView?.pause()
                 return@OnTouchListener false
             }
             MotionEvent.ACTION_UP -> {
-                Timber.v("MotionEvent.ACTION_UP")
                 val now = System.currentTimeMillis()
                 storiesProgressView?.resume()
                 return@OnTouchListener limit < now - pressTime
@@ -90,6 +88,7 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
         } else {
             // restart animation
             counter = MainActivity.progressState.get(arguments?.getInt(EXTRA_POSITION) ?: 0)
+            Timber.d("startStories onResume(): currentPage(${arguments?.getInt(EXTRA_POSITION)}) counter($counter)")
             storiesProgressView?.startStories(counter)
         }
     }
@@ -97,20 +96,24 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
     override fun onPause() {
         super.onPause()
         Timber.v("${arguments?.getInt(EXTRA_POSITION)}: onPause")
-        pause()
+//        storiesProgressView?.pause()
+        storiesProgressView?.abandon()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        counter = restorePosition()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_story, container, false)
-        storiesProgressView = view.findViewById<StoriesProgressView>(R.id.stories)
+        storiesProgressView = view.findViewById(R.id.stories)
         storiesProgressView?.setStoriesCount(PROGRESS_COUNT)
         storiesProgressView?.setStoryDuration(3000L)
-        // or
-        // storiesProgressView.setStoriesCountWithDurations(durations);
         storiesProgressView?.setStoriesListener(this)
 
         // bind image
-        image = view.findViewById<ImageView>(R.id.image)
+        image = view.findViewById(R.id.image)
         image?.setImageResource(resources[counter])
 
         // bind reverse view
@@ -127,7 +130,8 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
         // bind skip view
         val skip = view.findViewById<View>(R.id.skip)
         skip.setOnClickListener {
-            if (counter == resources.size) {
+            Timber.d("counter($counter) resources.size(${resources.size})")
+            if (counter == resources.size - 1) {
                 pageViewOperator?.nextPageView()
             } else {
                 storiesProgressView?.skip()
@@ -137,11 +141,8 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
         return view
     }
 
-    fun pause() {
-        storiesProgressView?.pause()
-    }
-
     fun resume() {
+        Timber.d("${arguments?.getInt(EXTRA_POSITION)}: resume")
         storiesProgressView?.resume()
     }
 
@@ -163,6 +164,7 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
 
     /* implement StoriesProgressView.StoriesListener start */
     override fun onNext() {
+        Timber.d("onNext(): counter($counter)")
         if (resources.size < counter + 1) {
             return
         }

@@ -5,6 +5,7 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -13,7 +14,11 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 
+import java.util.UUID;
+
 final class PausableProgressBar extends FrameLayout {
+
+    private static final String TAG = StoriesProgressView.class.getSimpleName();
 
     /***
      * progress満了タイマーのデフォルト時間
@@ -26,6 +31,7 @@ final class PausableProgressBar extends FrameLayout {
     private PausableScaleAnimation animation;
     private long duration = DEFAULT_PROGRESS_DURATION;
     private Callback callback;
+    private String uuid = UUID.randomUUID().toString();
 
     interface Callback {
         void onStartProgress();
@@ -95,7 +101,10 @@ final class PausableProgressBar extends FrameLayout {
         }
     }
 
+    private boolean isStarted = false;
+
     public void startProgress() {
+        Log.v(TAG, uuid + ": startProgress");
         maxProgressView.setVisibility(GONE);
 
         animation = new PausableScaleAnimation(0, 1, 1, 1, Animation.ABSOLUTE, 0, Animation.RELATIVE_TO_SELF, 0);
@@ -104,6 +113,11 @@ final class PausableProgressBar extends FrameLayout {
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                if (isStarted) {
+                    return;
+                }
+                isStarted = true;
+                Log.d(TAG, uuid + ": onAnimationStart");
                 frontProgressView.setVisibility(View.VISIBLE);
                 if (callback != null) callback.onStartProgress();
             }
@@ -114,6 +128,8 @@ final class PausableProgressBar extends FrameLayout {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                isStarted = false;
+                Log.d(TAG, uuid + ": onAnimationEnd");
                 if (callback != null) callback.onFinishProgress();
             }
         });

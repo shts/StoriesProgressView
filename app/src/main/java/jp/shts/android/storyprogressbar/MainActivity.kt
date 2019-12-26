@@ -2,9 +2,7 @@ package jp.shts.android.storyprogressbar
 
 import android.animation.Animator
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.Handler
 import android.util.SparseIntArray
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +23,7 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
 
     companion object {
         private const val PAGE_COUNT = 5
-        /* key: page-count, value: story-count   */
+        /* key: page-count, value: story-count */
         val progressState = SparseIntArray()
     }
 
@@ -33,7 +31,6 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
     private lateinit var pageAdapter: PageAdapter
 
     private var currentPage: Int = 0
-    private var pageBeforeDragging: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,37 +43,14 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
         viewPager = findViewById(R.id.viewpager)
         viewPager.adapter = pageAdapter
         viewPager.setPageTransformer(true, CubeOutTransformer())
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {
-                when (state) {
-                    0 -> {
-                        Timber.v("onPageScrollStateChanged(SCROLL_STATE_IDLE)")
-                        Handler().postDelayed({
-                            if (pageBeforeDragging == currentPage) {
-                                    currentFragment()?.resume()
-                            }
-                        }, 500)
-                    }
-                    1 -> {
-                        pageBeforeDragging = currentPage
-                        Timber.v("onPageScrollStateChanged(SCROLL_STATE_DRAGGING)")
-                    }
-                    2 -> {
-                        Timber.v("onPageScrollStateChanged(SCROLL_STATE_SETTLING)")
-                    }
-                }
-
-                // SCROLL_STATE_SETTLING してから onPageSelected が　500ml 以内に呼ばれなければ resume する。
-//                currentFragment()?.resume()
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                Timber.v("onPageSelected(${position})")
-                currentPage = position
+        viewPager.addOnPageChangeListener(object : PageChangeListener() {
+            override fun onPageScrollCanceled() {
                 currentFragment()?.resume()
+            }
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                currentPage = position
+//                currentFragment()?.resume()
             }
         })
     }

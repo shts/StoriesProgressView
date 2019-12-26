@@ -7,11 +7,13 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 public class StoriesProgressView extends LinearLayout {
 
@@ -209,7 +211,9 @@ public class StoriesProgressView extends LinearLayout {
      * Start progress animation from specific progress
      */
     public void startStories(int from) {
+        Log.w(TAG, "startStories start from(" + from + ")");
         for (int i = 0; i < from; i++) {
+            progressBars.get(i).clear();
             progressBars.get(i).setMaxWithoutCallback();
         }
         progressBars.get(from).startProgress();
@@ -222,6 +226,10 @@ public class StoriesProgressView extends LinearLayout {
         for (PausableProgressBar p : progressBars) {
             p.clear();
         }
+    }
+
+    public void abandon() {
+        progressBars.get(current).setMinWithoutCallback();
     }
 
     /**
