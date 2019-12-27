@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
         viewPager.setPageTransformer(true, CubeOutTransformer())
         viewPager.addOnPageChangeListener(object : PageChangeListener() {
             override fun onPageScrollCanceled() {
+                Timber.d("onPageScrollCanceled()")
                 currentFragment()?.resume()
             }
             override fun onPageSelected(position: Int) {

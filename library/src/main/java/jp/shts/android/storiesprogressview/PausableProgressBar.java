@@ -31,7 +31,6 @@ final class PausableProgressBar extends FrameLayout {
     private PausableScaleAnimation animation;
     private long duration = DEFAULT_PROGRESS_DURATION;
     private Callback callback;
-    private String uuid = UUID.randomUUID().toString();
 
     interface Callback {
         void onStartProgress();
@@ -104,7 +103,7 @@ final class PausableProgressBar extends FrameLayout {
     private boolean isStarted = false;
 
     public void startProgress() {
-        Log.v(TAG, uuid + ": startProgress");
+        Log.v(TAG, getTag() + ": startProgress");
         maxProgressView.setVisibility(GONE);
 
         animation = new PausableScaleAnimation(0, 1, 1, 1, Animation.ABSOLUTE, 0, Animation.RELATIVE_TO_SELF, 0);
@@ -117,7 +116,7 @@ final class PausableProgressBar extends FrameLayout {
                     return;
                 }
                 isStarted = true;
-                Log.d(TAG, uuid + ": onAnimationStart");
+                Log.d(TAG, getTag() + ": onAnimationStart");
                 frontProgressView.setVisibility(View.VISIBLE);
                 if (callback != null) callback.onStartProgress();
             }
@@ -129,7 +128,7 @@ final class PausableProgressBar extends FrameLayout {
             @Override
             public void onAnimationEnd(Animation animation) {
                 isStarted = false;
-                Log.d(TAG, uuid + ": onAnimationEnd");
+                Log.d(TAG, getTag() + ": onAnimationEnd");
                 if (callback != null) callback.onFinishProgress();
             }
         });

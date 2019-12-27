@@ -77,6 +77,7 @@ public class StoriesProgressView extends LinearLayout {
 
         for (int i = 0; i < storiesCount; i++) {
             final PausableProgressBar p = createProgressBar();
+            p.setTag("p(" + position + ") c(" + i + ")"); // debug
             progressBars.add(p);
             addView(p);
             if ((i + 1) < storiesCount) {
@@ -95,6 +96,12 @@ public class StoriesProgressView extends LinearLayout {
         View v = new View(getContext());
         v.setLayoutParams(SPACE_LAYOUT_PARAM);
         return v;
+    }
+private int position = -1;
+    public void setStoriesCountDebug(int storiesCount, int position) {
+        this.storiesCount = storiesCount;
+        this.position = position;
+        bindViews();
     }
 
     /**
@@ -211,9 +218,11 @@ public class StoriesProgressView extends LinearLayout {
      * Start progress animation from specific progress
      */
     public void startStories(int from) {
-        Log.w(TAG, "startStories start from(" + from + ")");
-        for (int i = 0; i < from; i++) {
+        Log.w(TAG, getTag() + ": startStories start from(" + from + ")");
+        for (int i = 0; i < progressBars.size(); i++) {
             progressBars.get(i).clear();
+        }
+        for (int i = 0; i < from; i++) {
             progressBars.get(i).setMaxWithoutCallback();
         }
         progressBars.get(from).startProgress();

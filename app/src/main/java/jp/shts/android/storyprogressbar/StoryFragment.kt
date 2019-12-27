@@ -1,5 +1,6 @@
 package jp.shts.android.storyprogressbar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -88,7 +89,7 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
         } else {
             // restart animation
             counter = MainActivity.progressState.get(arguments?.getInt(EXTRA_POSITION) ?: 0)
-            Timber.d("startStories onResume(): currentPage(${arguments?.getInt(EXTRA_POSITION)}) counter($counter)")
+            Timber.d("startStories via onResume(): cp(${arguments?.getInt(EXTRA_POSITION)}) c($counter)")
             storiesProgressView?.startStories(counter)
         }
     }
@@ -108,13 +109,14 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_story, container, false)
         storiesProgressView = view.findViewById(R.id.stories)
-        storiesProgressView?.setStoriesCount(PROGRESS_COUNT)
+        storiesProgressView?.setStoriesCountDebug(PROGRESS_COUNT, arguments?.getInt(EXTRA_POSITION) ?: -1)
         storiesProgressView?.setStoryDuration(3000L)
         storiesProgressView?.setStoriesListener(this)
 
         // bind image
         image = view.findViewById(R.id.image)
         image?.setImageResource(resources[counter])
+        image?.setOnTouchListener(onTouchListener)
 
         // bind reverse view
         val reverse = view.findViewById<View>(R.id.reverse)
@@ -142,6 +144,7 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
     }
 
     fun resume() {
+        Timber.d("startStories via onPageScrollCanceled(): cp(${arguments?.getInt(EXTRA_POSITION)}) c($counter)")
         Timber.d("${arguments?.getInt(EXTRA_POSITION)}: resume")
         storiesProgressView?.resume()
     }
