@@ -7,11 +7,13 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 public class StoriesProgressView extends LinearLayout {
 
@@ -75,6 +77,7 @@ public class StoriesProgressView extends LinearLayout {
 
         for (int i = 0; i < storiesCount; i++) {
             final PausableProgressBar p = createProgressBar();
+            p.setTag("p(" + position + ") c(" + i + ")"); // debug
             progressBars.add(p);
             addView(p);
             if ((i + 1) < storiesCount) {
@@ -93,6 +96,12 @@ public class StoriesProgressView extends LinearLayout {
         View v = new View(getContext());
         v.setLayoutParams(SPACE_LAYOUT_PARAM);
         return v;
+    }
+private int position = -1;
+    public void setStoriesCountDebug(int storiesCount, int position) {
+        this.storiesCount = storiesCount;
+        this.position = position;
+        bindViews();
     }
 
     /**
@@ -209,6 +218,10 @@ public class StoriesProgressView extends LinearLayout {
      * Start progress animation from specific progress
      */
     public void startStories(int from) {
+        Log.w(TAG, getTag() + ": startStories start from(" + from + ")");
+        for (int i = 0; i < progressBars.size(); i++) {
+            progressBars.get(i).clear();
+        }
         for (int i = 0; i < from; i++) {
             progressBars.get(i).setMaxWithoutCallback();
         }
@@ -222,6 +235,10 @@ public class StoriesProgressView extends LinearLayout {
         for (PausableProgressBar p : progressBars) {
             p.clear();
         }
+    }
+
+    public void abandon() {
+        progressBars.get(current).setMinWithoutCallback();
     }
 
     /**
