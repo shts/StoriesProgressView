@@ -5,6 +5,7 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -95,11 +96,18 @@ final class PausableProgressBar extends FrameLayout {
         }
     }
 
-    public void startProgress() {
+    public void startProgress(long startTime) {
         maxProgressView.setVisibility(GONE);
 
-        animation = new PausableScaleAnimation(0, 1, 1, 1, Animation.ABSOLUTE, 0, Animation.RELATIVE_TO_SELF, 0);
-        animation.setDuration(duration);
+        long remainingTime = duration - startTime;
+        if(remainingTime < 0) {
+            throw new IllegalArgumentException("Start time is greater than story duration");
+        }
+        float fromX = 1.0f - ((float)remainingTime/(float)duration);
+        Log.d("PausableProgressBar", "fromX = " + fromX);
+        animation = new PausableScaleAnimation(fromX, 1, 1, 1, Animation.ABSOLUTE, 0, Animation.RELATIVE_TO_SELF, 0);
+        animation.setDuration(remainingTime);
+
         animation.setInterpolator(new LinearInterpolator());
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
