@@ -104,7 +104,7 @@ final class PausableProgressBar extends FrameLayout {
             throw new IllegalArgumentException("Start time is greater than story duration");
         }
         float fromX = 1.0f - ((float)remainingTime/(float)duration);
-        Log.d("PausableProgressBar", "fromX = " + fromX);
+
         animation = new PausableScaleAnimation(fromX, 1, 1, 1, Animation.ABSOLUTE, 0, Animation.RELATIVE_TO_SELF, 0);
         animation.setDuration(remainingTime);
 
