@@ -1,17 +1,21 @@
 package jp.shts.android.storiesprogressview;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
-import androidx.annotation.AttrRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.Transformation;
 import android.widget.FrameLayout;
+
+import androidx.annotation.AttrRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
 
 final class PausableProgressBar extends FrameLayout {
 
@@ -20,8 +24,8 @@ final class PausableProgressBar extends FrameLayout {
      */
     private static final int DEFAULT_PROGRESS_DURATION = 2000;
 
-    private View frontProgressView;
-    private View maxProgressView;
+    private final View frontProgressView;
+    private final View maxProgressView;
 
     private PausableScaleAnimation animation;
     private long duration = DEFAULT_PROGRESS_DURATION;
@@ -29,6 +33,7 @@ final class PausableProgressBar extends FrameLayout {
 
     interface Callback {
         void onStartProgress();
+
         void onFinishProgress();
     }
 
@@ -68,7 +73,7 @@ final class PausableProgressBar extends FrameLayout {
 
         maxProgressView.setVisibility(VISIBLE);
         if (animation != null) {
-            animation.setAnimationListener(null);
+            animation.removeAllListeners();
             animation.cancel();
         }
     }
@@ -78,16 +83,17 @@ final class PausableProgressBar extends FrameLayout {
 
         maxProgressView.setVisibility(VISIBLE);
         if (animation != null) {
-            animation.setAnimationListener(null);
+            animation.removeAllListeners();
             animation.cancel();
         }
     }
 
     private void finishProgress(boolean isMax) {
         if (isMax) maxProgressView.setBackgroundResource(R.color.progress_max_active);
+        frontProgressView.setScaleX(isMax ? 1f : 0f);
         maxProgressView.setVisibility(isMax ? VISIBLE : GONE);
         if (animation != null) {
-            animation.setAnimationListener(null);
+            animation.removeAllListeners();
             animation.cancel();
             if (callback != null) {
                 callback.onFinishProgress();
@@ -97,28 +103,22 @@ final class PausableProgressBar extends FrameLayout {
 
     public void startProgress() {
         maxProgressView.setVisibility(GONE);
-
-        animation = new PausableScaleAnimation(0, 1, 1, 1, Animation.ABSOLUTE, 0, Animation.RELATIVE_TO_SELF, 0);
+        animation = new PausableScaleAnimation(frontProgressView, 0F, 1F, 0F, 0F);
         animation.setDuration(duration);
         animation.setInterpolator(new LinearInterpolator());
-        animation.setAnimationListener(new Animation.AnimationListener() {
+        animation.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationStart(Animation animation) {
+            public void onAnimationStart(Animator animation) {
                 frontProgressView.setVisibility(View.VISIBLE);
                 if (callback != null) callback.onStartProgress();
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
+            public void onAnimationEnd(Animator animation) {
                 if (callback != null) callback.onFinishProgress();
             }
         });
-        animation.setFillAfter(true);
-        frontProgressView.startAnimation(animation);
+        animation.start();
     }
 
     public void pauseProgress() {
@@ -135,49 +135,92 @@ final class PausableProgressBar extends FrameLayout {
 
     void clear() {
         if (animation != null) {
-            animation.setAnimationListener(null);
+            animation.removeAllListeners();
             animation.cancel();
             animation = null;
         }
     }
 
-    private class PausableScaleAnimation extends ScaleAnimation {
+    private static class PausableScaleAnimation {
+        private boolean paused = false;
+        private final ObjectAnimator animator;
+        private ArrayList<Animator.AnimatorListener> listeners;
+        private long currentPlayTime = 0;
 
-        private long mElapsedAtPause = 0;
-        private boolean mPaused = false;
-
-        PausableScaleAnimation(float fromX, float toX, float fromY,
-                               float toY, int pivotXType, float pivotXValue, int pivotYType,
-                               float pivotYValue) {
-            super(fromX, toX, fromY, toY, pivotXType, pivotXValue, pivotYType,
-                    pivotYValue);
+        public PausableScaleAnimation(View view, float fromXScale,
+                                      float toXScale, float pivotX, float pivotY) {
+            animator = createPausableScaleAnimator(view, fromXScale, toXScale, pivotX, pivotY);
         }
 
-        @Override
-        public boolean getTransformation(long currentTime, Transformation outTransformation, float scale) {
-            if (mPaused && mElapsedAtPause == 0) {
-                mElapsedAtPause = currentTime - getStartTime();
+        private ObjectAnimator createPausableScaleAnimator(View view, float fromXScale,
+                                                           float toXScale, float pivotX, float pivotY) {
+            view.setPivotX(pivotX);
+            view.setPivotY(pivotY);
+            return ObjectAnimator.ofFloat(view, View.SCALE_X, fromXScale, toXScale);
+        }
+
+        public void start() {
+            animator.start();
+        }
+
+        public void pause() {
+            if (paused) return;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                animator.pause();
+            } else {
+                // save currentPlayTime and clear listeners to avoid sending events
+                currentPlayTime = animator.getCurrentPlayTime();
+                clearAnimatorListeners();
             }
-            if (mPaused) {
-                setStartTime(currentTime - mElapsedAtPause);
+            paused = true;
+        }
+
+        public void resume() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                animator.resume();
+            } else {
+                // start animation, set currentPlayTime
+                // and reinitialize listeners
+                start();
+                animator.setCurrentPlayTime(currentPlayTime);
+                setUpListeners();
             }
-            return super.getTransformation(currentTime, outTransformation, scale);
+            paused = false;
         }
 
-        /***
-         * pause animation
-         */
-        void pause() {
-            if (mPaused) return;
-            mElapsedAtPause = 0;
-            mPaused = true;
+        private void clearAnimatorListeners() {
+            listeners = new ArrayList<>();
+            listeners.addAll(animator.getListeners());
+            for (Animator.AnimatorListener listener : listeners) {
+                animator.removeListener(listener);
+            }
+            cancel();
         }
 
-        /***
-         * resume animation
-         */
-        void resume() {
-            mPaused = false;
+        private void setUpListeners() {
+            for (Animator.AnimatorListener listener : listeners) {
+                animator.addListener(listener);
+            }
+        }
+
+        public void setDuration(long duration) {
+            animator.setDuration(duration);
+        }
+
+        public void setInterpolator(LinearInterpolator interpolator) {
+            animator.setInterpolator(interpolator);
+        }
+
+        public void addListener(AnimatorListenerAdapter listener) {
+            animator.addListener(listener);
+        }
+
+        public void removeAllListeners() {
+            animator.removeAllListeners();
+        }
+
+        public void cancel() {
+            animator.cancel();
         }
     }
 }
